@@ -15,11 +15,6 @@ var app = express();
 //Mongoose setup
 console.log("APP.JS");
 
-var RedisStore = require('connect-redis')(session);
-SESSION_SECRET = process.env.SESSION_SECRET || "secret";
-REDIS_URL      = process.env.REDIS_URL      || "redis://localhost:6379";
-
-
 // uncomment after placing your favicon in /public
 app.use(logger('dev'));
 app.use(bodyParser.json());
