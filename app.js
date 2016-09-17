@@ -22,17 +22,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(session({
-                secret: SESSION_SECRET,
-                store: new RedisStore({
-                  url: REDIS_URL
-                }),
-                resave: false,
-                saveUninitialized: true
-                }));
-
-console.log("connected to redis");
-
 app.use('/', routes);
 
 
