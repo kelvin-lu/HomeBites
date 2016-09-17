@@ -2,7 +2,7 @@ var Connection = require('tedious').Connection;
 
 var config = {
     userName: 'jarvis',
-    password: 'Hack2019',
+    password: process.env.hbAzurePW,
     server: 'homebites.database.windows.net',
     // If you are on Microsoft Azure, you need this:
     options: {encrypt: true, database: 'AdventureWorks'}
@@ -17,7 +17,8 @@ connection.on('connect', function(err) {
 RequestController = {};
 
 RequestController.requestFood = function(req, res, next){
-
+    console.log("Hello");
+    res.send("Hello");
 }
 
 RequestController.seeRequests = function(req, res, next){
