@@ -2,7 +2,7 @@ var Connection = require('tedious').Connection;
 
 var config = {
     userName: 'jarvis',
-    password: '',
+    password: 'Hack2019',
     server: 'homeBites.database.windows.net',
     // If you are on Microsoft Azure, you need this:
     options: {encrypt: true, database: 'homeBites'}
@@ -10,8 +10,11 @@ var config = {
 var connection = new Connection(config);
 connection.on('connect', function(err) {
 // If no error, then good to proceed.
+    if (err){
+      throw err;
+    }
     console.log("Connected to Azure DB");
-    executeStatement();
+
 });
 
 var Request = require('tedious').Request;
