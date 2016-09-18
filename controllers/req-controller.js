@@ -31,7 +31,7 @@ RequestController = {};
 
 /*
  * Request a food item for the night. Puts a request in our SQL databases
- * @param name      the name of the student requesting the food
+ * @param id        the ID of the student requesting the food
  * @param location  the location of the student requesting food
  * @param desc      the food style DESCription requested
  * @return 'DONE' if request input was successful, 'ERR' if not.
@@ -40,11 +40,11 @@ RequestController.requestFood = function(req, res, next){
   //Uhh.. This function just calls another function ._.
   //Going to get rid of this layer - function calling takes time on the computer
   //foodToSQL();
-  var student    = req.query.name,
+  var id         = req.query.name,
       location   = req.query.location,
       desc       = req.query.desc;
 
-  request = new Request("INSERT SalesLT.Product (Student, Host, Location, Desc, TimeReq, Offers, Dinner) OUTPUT INSERTED.ProductID " +
+  request = new Request("INSERT SalesLT.Product (Student, Location, Desc, TimeReq, Offers, Dinner) OUTPUT INSERTED.ProductID " +
                       "VALUES (@Name, @Location, @Desc, CURRENT_TIMESTAMP);", function(err) {
     if (err) {
       console.log(err);
@@ -72,8 +72,8 @@ RequestController.requestFood = function(req, res, next){
  *
  *
  */
- RequestController.openOffers = function(req, res, next){
-   
+ RequestController.seeOpenOffers = function(req, res, next){
+
  }
 
 /*
