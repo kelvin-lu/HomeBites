@@ -1,5 +1,5 @@
 var Models = require('../models/Model.js');
-var geolib = require('geolib')
+var geolib = require('geolib');
 
 RequestController = {};
 
@@ -16,7 +16,7 @@ RequestController.requestFood = function(req, res, next){
   var id         = req.query.id,
       location   = req.query.location,
       desc       = req.query.desc,
-      dist       = parseInt(req.query.dist,10),
+      dist       = parseFloat(req.query.dist),
       max_time   = req.query.time,
       cost       = req.query.cost;
 
@@ -41,7 +41,7 @@ RequestController.requestFood = function(req, res, next){
   });
 
   var querySpec = {
-      query: 'SELECT * FROM docs d WHERE d.id = @id',
+      query: 'SELECT * FROM docs d WHERE d.fbID = @id',
       parameters: [{
           name: '@id',
           value: id
@@ -53,7 +53,7 @@ RequestController.requestFood = function(req, res, next){
       user.location = location;
     } else{
       var user = {
-        "id"       : id,
+        "fbID"       : id,
         "location" : location
       }
 
@@ -76,14 +76,14 @@ RequestController.seeRequests = function(req, res, next){
   var location = req.query.location;
 
   var reqQuer = {
-    query: "SELECT * FROM docs d where d.isOpen = 1",
+    query: "SELECT * FROM docs d where d.isOpen = 1"
   }
-  Models.client.queryDocuments(Models.requests._self, querySpec).toArray(function(err, reqs){
+  Models.client.queryDocuments(Models.requests._self, reqQuer).toArray(function(err, reqs){
     if (err) return next(err);
     for (var index in reqs){
       var request = reqs[index];
       //calculate distance to host location
-      request.distTo = RequestController.distCalc(location, req.location);
+      request.distTo = RequestController.distCalc(location, request.location);
 
       //remove if too far away
       if(request.distTo > request.dist){
@@ -99,8 +99,62 @@ RequestController.seeRequests = function(req, res, next){
   });
 };
 
+/*
+ *
+ *
+ *
+ */
+ RequestController.putLocID = function(req, res, next){
+   var location = req.query.location,
+       id       = req.query.id;
+
+   
+ }
+
+/*
+ * Finds a location (lat long form) based on an ID
+ * @params id the id of the facebook user to search the location from
+ * @return the location (lat long) of the facebook user when last using our bot.
+ */
+ RequestController.locByID = function(req, res, next){
+   var id = req.query.id;
+
+   var userQuer = {
+     query: 'SELECT * FROM docs d WHERE d.fbID = @id',
+     parameters: [{
+         name: '@id',
+         value: id
+     }]
+   };
+
+   Models.client.queryDocuments(Models.users._self, userQuer).toArray(function(err, users){
+     if (err) return next(err);
+     res.send(users[0].location);
+   });
+ };
+
+
 RequestController.distCalc = function(point1, point2){
 
+  console.log(point1);
+  console.log(point2);
+  geo1 = point1.split(' ');
+  geo2 = point2.split(' ');
+
+  loc1 = {
+    latitude  : parseFloat(geo1[0]),
+    longitude : parseFloat(geo1[1])
+  }
+
+  loc2 = {
+    latitude  : parseFloat(geo2[0]),
+    longitude : parseFloat(geo2[1])
+  }
+
+  console.log(loc1);
+  console.log(loc2);
+
+  return geolib.getDistance(loc1, loc2, 10) * 0.621;
 };
 
 //It's good habit to have this at the very end
