@@ -68,6 +68,15 @@ RequestController.requestFood = function(req, res, next){
 }
 
 /*
+ *
+ *
+ *
+ */
+ RequestController.openOffers = function(req, res, next){
+   
+ }
+
+/*
  * Opens a dinner for the night.
  * @param name      the name of the host serving the food
  * @param location  the location of the host
