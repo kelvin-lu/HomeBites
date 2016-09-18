@@ -11,7 +11,6 @@ Models.client  = new DocumentClient(endpoint, {"masterKey": authKey});
 var databaseDefinition = {"id": "homebites"};
 var requestDefinition = {"id": "requests"};
 var userDefinition = {"id": "users"};
-var dinnerDefinition = {"id": "dinners"};
 
 Models.client.createDatabase(databaseDefinition, function(err, database){
   if (err) throw err;
@@ -22,10 +21,6 @@ Models.client.createDatabase(databaseDefinition, function(err, database){
   Models.client.createCollection(database._self, userDefinition, function(err, userCollection){
     if (err) throw err;
       Models.users = userCollection;
-  });
-  Models.client.createCollection(database._self, dinnerDefinition, function(err, dinnerCollection){
-    if (err) throw err;
-    Models.dinners = dinnerCollection;
   });
 
   console.log("collections created");
