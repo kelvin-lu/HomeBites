@@ -27,7 +27,6 @@ RequestController.requestFood = function(req, res, next){
     "location" : location,
     "max_time" : max_time,
     "st_time"  : Date.now(),
-    "offers"   : "",
     "distance" : dist,
     "isOpen"   : 1
   };
@@ -53,7 +52,7 @@ RequestController.requestFood = function(req, res, next){
       Models.client.deleteDocument(user._self, function(err){
         if(err) return next(err);
       });
-    } else{
+    }
       var user = {
         "fbID"       : id,
         "location" : location
@@ -62,8 +61,6 @@ RequestController.requestFood = function(req, res, next){
       Models.client.createDocument(Models.users._self, user, function(err, doc){
         if (err) return next(err);
       });
-    }
-
 
   });
 };
@@ -88,7 +85,7 @@ RequestController.seeRequests = function(req, res, next){
       request.distTo = RequestController.distCalc(location, request.location);
 
       //remove if too far away
-      if(request.distTo > request.dist){
+      if(request.distTo > request.dist || request.max_time < Date.now()) {
         reqs.splice(index, 1);
       }
     }
@@ -97,7 +94,7 @@ RequestController.seeRequests = function(req, res, next){
     reqs.sort(function(r1, r2){
       return r1.distTo - r2.distTo;
     });
-    res.send(reqs);
+    res.send(JSON.stringify(reqs));
   });
 };
 
@@ -122,9 +119,12 @@ RequestController.seeRequests = function(req, res, next){
      if (users.length > 0){
        user = users[0];
        Models.client.deleteDocument(user._self, function(err){
-         if(err) return next(err);
+         if(err){
+           console.log(err);
+           return next(err);
+         }
        });
-     } else{
+     }
        var user = {
          "fbID"       : id,
          "location"   : location
@@ -133,8 +133,6 @@ RequestController.seeRequests = function(req, res, next){
        Models.client.createDocument(Models.users._self, user, function(err, doc){
          if (err) return next(err);
        });
-     }
-
    });
 
    res.send("DONE");
@@ -147,6 +145,7 @@ RequestController.seeRequests = function(req, res, next){
  */
  RequestController.locByID = function(req, res, next){
    var id = req.query.id;
+   console.log('id');
 
    var userQuer = {
      query: 'SELECT * FROM docs d WHERE d.fbID = @id',
@@ -158,9 +157,40 @@ RequestController.seeRequests = function(req, res, next){
 
    Models.client.queryDocuments(Models.users._self, userQuer).toArray(function(err, users){
      if (err) return next(err);
+     if (users.length < 1){
+       res.send("null");
+     }
+     console.log(users);
      res.send(users[0].location);
    });
  };
+
+ /*
+  * Finds a request based on an ID
+  * @params id the id of the facebook user to search from
+  * @return the request of the facebook user when last using our bot.
+  */
+  RequestController.reqByID = function(req, res, next){
+    var id = req.query.id;
+    console.log('id');
+
+    var userQuer = {
+      query: 'SELECT * FROM docs d WHERE d.fbID = @id',
+      parameters: [{
+          name: '@id',
+          value: id
+      }]
+    };
+
+    Models.client.queryDocuments(Models.requests._self, userQuer).toArray(function(err, users){
+      if (err) return next(err);
+      if (users.length < 1){
+        res.send("null");
+      }
+      console.log(users);
+      res.send(users[users.length-1]);
+    });
+  };
 
 
 RequestController.distCalc = function(point1, point2){
