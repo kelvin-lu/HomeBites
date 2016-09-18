@@ -17,8 +17,7 @@ connection.on('connect', function(err) {
 RequestController = {};
 
 RequestController.requestFood = function(req, res, next){
-    console.log("Hello");
-    res.send("Hello");
+  
 }
 
 RequestController.seeRequests = function(req, res, next){

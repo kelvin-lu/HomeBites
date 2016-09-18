@@ -4,6 +4,6 @@ var router = express.Router();
 var reqController = require('../controllers/req-controller')
 
 
-router.post('/request', reqController.requestFood);
+router.get('/request/', reqController.requestFood);
 
 module.exports = router;
