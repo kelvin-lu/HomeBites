@@ -33,7 +33,7 @@ RequestController = {};
  * Request a food item for the night. Puts a request in our SQL databases
  * @param name      the name of the student requesting the food
  * @param location  the location of the student requesting food
- * @param food      the food style requested
+ * @param desc      the food style DESCription requested
  * @return 'DONE' if request input was successful, 'ERR' if not.
  */
 RequestController.requestFood = function(req, res, next){
@@ -42,29 +42,69 @@ RequestController.requestFood = function(req, res, next){
   //foodToSQL();
   var student    = req.query.name,
       location   = req.query.location,
-      food       = req.query.food,
+      desc       = req.query.desc;
 
-  request = new Request("INSERT SalesLT.Product (Student, Host, Location, Food, TimeReq, TimeServ) OUTPUT INSERTED.ProductID " +
-                      "VALUES (@Name, @Location, @Food, CURRENT_TIMESTAMP);", function(err) {
-        if (err) {
-          console.log(err);
-          res.send("ERR");
+  request = new Request("INSERT SalesLT.Product (Student, Host, Location, Desc, TimeReq, Offers, Dinner) OUTPUT INSERTED.ProductID " +
+                      "VALUES (@Name, @Location, @Desc, CURRENT_TIMESTAMP);", function(err) {
+    if (err) {
+      console.log(err);
+      res.send("ERR");
+    }
+    res.send("DONE");
+  });
+  request.addParameter('Name', TYPES.NVarChar, student);
+  request.addParameter('Location', TYPES.NVarChar , location);
+  request.addParameter('Desc', TYPES.NVarChar, desc);
+  request.on('row', function(columns) {
+      columns.forEach(function(column) {
+        if (column.value === null) {
+          console.log('NULL');
+        } else {
+          console.log("Product id of inserted item is " + column.value);
         }
-        res.send("DONE");
       });
-      request.addParameter('Name', TYPES.NVarChar, Student);
-      request.addParameter('Location', TYPES.NVarChar , location);
-      request.addParameter('Food', TYPES.NVarChar, food);
-      request.on('row', function(columns) {
-          columns.forEach(function(column) {
-            if (column.value === null) {
-              console.log('NULL');
-            } else {
-              console.log("Product id of inserted item is " + column.value);
-            }
-          });
+  });
+  connection.execSql(request);
+}
+
+/*
+ * Opens a dinner for the night.
+ * @param name      the name of the host serving the food
+ * @param location  the location of the host
+ * @param desc      the food style DESCription that will be served
+ * @return 'DONE' if request input was successful, 'ERR' if not.
+ */
+RequestController.openDinner = function(req, res, next){
+  var host     = req.query.name,
+      location = req.query.location,
+      capacity = req.query.capacity,
+      food     = req.query.food;
+
+      var student    = req.query.name,
+          location   = req.query.location,
+          desc       = req.query.desc,
+
+  request = new Request("INSERT SalesLT.Product (Student, Host, Location, Desc, TimeReq, Offers, Dinner) OUTPUT INSERTED.ProductID " +
+                      "VALUES (@Name, @Location, @Desc, CURRENT_TIMESTAMP);", function(err) {
+    if (err) {
+      console.log(err);
+      res.send("ERR");
+    }
+    res.send("DONE");
+  });
+  request.addParameter('Name', TYPES.NVarChar, student);
+  request.addParameter('Location', TYPES.NVarChar , location);
+  request.addParameter('Desc', TYPES.NVarChar, desc);
+  request.on('row', function(columns) {
+      columns.forEach(function(column) {
+        if (column.value === null) {
+          console.log('NULL');
+        } else {
+          console.log("Product id of inserted item is " + column.value);
+        }
       });
-      connection.execSql(request);
+  });
+  connection.execSql(request);
 }
 
 /*
