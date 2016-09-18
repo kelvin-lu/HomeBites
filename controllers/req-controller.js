@@ -1,11 +1,16 @@
 var Connection = require('tedious').Connection;
+var geo        = require('geolib');
 
 var config = {
     userName: 'jarvis',
     password: 'Hack2019',
     server: 'homeBites.database.windows.net',
     // If you are on Microsoft Azure, you need this:
-    options: {encrypt: true, database: 'homeBites'}
+    options: {
+      encrypt: true,
+      database: 'homeBites'
+      rowCollectionOnRequestCompletion: true;
+    }
 };
 var connection = new Connection(config);
 connection.on('connect', function(err) {
@@ -62,10 +67,16 @@ RequestController.requestFood = function(req, res, next){
       connection.execSql(request);
 }
 
+/*
+ * Looks at nearby requests for food.
+ * @param location the location of the server
+ * @return SQL rows of all open requests within (5 km?)
+ *
+ */
 RequestController.seeOpenRequests = function(req, res, next){
-    request = new Request("SELECT c.CustomerID, c.CompanyName,COUNT(soh.SalesOrderID) AS OrderCount FROM SalesLT.Customer AS c LEFT OUTER JOIN SalesLT.SalesOrderHeader AS soh ON c.CustomerID = soh.CustomerID GROUP BY c.CustomerID, c.CompanyName ORDER BY OrderCount DESC;", function(err) {
-      if (err) {
-        console.log(err);
+  request = new Request("SELECT * FROM (help Sean) WHERE IsOpen = 1", function(err) {
+    if (err) {
+      console.log(err);
         res.send("ERR");
       }
     });
