@@ -14,7 +14,7 @@
     "es6-promise": "^3.2.1",
     "express": "~4.12.2",
     "express-session": "*",
-    "geolib": "*",
+    "geolib": "^2.0.21",
     "moment": "^2.11.2",
     "morgan": "~1.5.1",
     "request": "^2.73.0",
