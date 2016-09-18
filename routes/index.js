@@ -5,7 +5,9 @@ var reqController = require('../controllers/req-controller')
 
 
 router.get('/request/', reqController.requestFood);
-router.get('/see', reqController.seeOpenRequests);
-router.get('/serve', reqController.closeOpenRequest);
+router.get('/see/requests/', reqController.seeRequests);
+router.get('/offer/', reqController.offerDinner)
+router.get('/see/offers/', reqController.seeOffers)
+router.get('/accept', reqController.closeOpenRequest);
 
 module.exports = router;
