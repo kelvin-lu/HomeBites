@@ -1,31 +1,4 @@
-var Connection = require('tedious').Connection;
-var geo        = require('geolib');
-
-var config = {
-    userName: 'jarvis',
-    password: 'Hack2019',
-    server: 'homeBites.database.windows.net',
-    // If you are on Microsoft Azure, you need this:
-    options: {
-      encrypt: true,
-      database: 'homeBites'
-      rowCollectionOnRequestCompletion: true;
-    }
-};
-var connection = new Connection(config);
-connection.on('connect', function(err) {
-    if (err){
-      //Stop and throw an error
-      throw err;
-    }
-
-    // If no error, then good to proceed.
-    console.log("Connected to Azure DB");
-
-});
-
-var Request = require('tedious').Request;
-var TYPES = require('tedious').TYPES;
+var Models = require('../models/Model.js')
 
 RequestController = {};
 
@@ -44,35 +17,17 @@ RequestController.requestFood = function(req, res, next){
       location   = req.query.location,
       desc       = req.query.desc;
 
-  request = new Request("INSERT SalesLT.Product (Student, Location, Desc, TimeReq, Offers, Dinner) OUTPUT INSERTED.ProductID " +
-                      "VALUES (@Name, @Location, @Desc, CURRENT_TIMESTAMP);", function(err) {
-    if (err) {
-      console.log(err);
-      res.send("ERR");
-    }
-    res.send("DONE");
-  });
-  request.addParameter('Name', TYPES.NVarChar, student);
-  request.addParameter('Location', TYPES.NVarChar , location);
-  request.addParameter('Desc', TYPES.NVarChar, desc);
-  request.on('row', function(columns) {
-      columns.forEach(function(column) {
-        if (column.value === null) {
-          console.log('NULL');
-        } else {
-          console.log("Product id of inserted item is " + column.value);
-        }
-      });
-  });
-  connection.execSql(request);
+
 }
 
 /*
- *
+ * Looks at the Offers that a
  *
  *
  */
- RequestController.seeOpenOffers = function(req, res, next){
+ RequestController.seeOffers = function(req, res, next){
+   var id   = req.query.name;
+
 
  }
 
@@ -93,27 +48,6 @@ RequestController.openDinner = function(req, res, next){
           location   = req.query.location,
           desc       = req.query.desc,
 
-  request = new Request("INSERT SalesLT.Product (Student, Host, Location, Desc, TimeReq, Offers, Dinner) OUTPUT INSERTED.ProductID " +
-                      "VALUES (@Name, @Location, @Desc, CURRENT_TIMESTAMP);", function(err) {
-    if (err) {
-      console.log(err);
-      res.send("ERR");
-    }
-    res.send("DONE");
-  });
-  request.addParameter('Name', TYPES.NVarChar, student);
-  request.addParameter('Location', TYPES.NVarChar , location);
-  request.addParameter('Desc', TYPES.NVarChar, desc);
-  request.on('row', function(columns) {
-      columns.forEach(function(column) {
-        if (column.value === null) {
-          console.log('NULL');
-        } else {
-          console.log("Product id of inserted item is " + column.value);
-        }
-      });
-  });
-  connection.execSql(request);
 }
 
 /*
@@ -122,30 +56,8 @@ RequestController.openDinner = function(req, res, next){
  * @return SQL rows of all open requests within (5 km?)
  *
  */
-RequestController.seeOpenRequests = function(req, res, next){
-  request = new Request("SELECT * FROM (help Sean) WHERE IsOpen = 1", function(err) {
-    if (err) {
-      console.log(err);
-        res.send("ERR");
-      }
-    });
-    var result = "";
-    request.on('row', function(columns) {
-    columns.forEach(function(column) {
-      if (column.value === null) {
-        console.log('NULL');
-      } else {
-        result+= column.value + " ";
-      }
-    });
-    console.log(result);
-    result ="";
-  });
+RequestController.seeRequests = function(req, res, next){
 
-  request.on('done', function(rowCount, more) {
-    console.log(rowCount + ' rows returned');
-  });
-  connection.execSql(request);
 }
 
 //It's good habit to have this at the very end
