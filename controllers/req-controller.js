@@ -1,4 +1,5 @@
-var Models = require('../models/Model.js')
+var Models = require('../models/Model.js');
+var geolib = require('geolib')
 
 RequestController = {};
 
@@ -15,7 +16,7 @@ RequestController.requestFood = function(req, res, next){
   var id         = req.query.id,
       location   = req.query.location,
       desc       = req.query.desc,
-      dist       = req.query.dist,
+      dist       = parseInt(req.query.dist,10),
       max_time   = req.query.time,
       cost       = req.query.cost;
 
@@ -23,10 +24,12 @@ RequestController.requestFood = function(req, res, next){
     "student"  : id,
     "desc"     : desc,
     "cost"     : cost,
+    "location" : location,
     "max_time" : max_time,
     "st_time"  : Date.now(),
     "offers"   : "",
-    "distance" : dist
+    "distance" : dist,
+    "isOpen"   : 1
   };
 
   console.log(request);
@@ -64,61 +67,39 @@ RequestController.requestFood = function(req, res, next){
 };
 
 /*
- * Looks at the Offers that a
- *
- *
- */
- RequestController.seeOffers = function(req, res, next){
-   var userQ = {
-       query: 'SELECT * FROM docs d WHERE d.id = @id',
-       parameters: [{
-           name: '@id',
-           value: req.query.id
-       }]
-   };
-
-   Models.client.queryDocuments(Models.users._self, userQ).toArray( function(err, users){
-     if (err) return next(err);
-     var dinnerQ = {
-         query: "SELECT * FROM docs d WHERE d.id IN (@id)",
-         parameters: [{
-             name: '@id',
-             value: users[0].offers
-         }]
-     };
-     Models.client.queryDocuments(Models.dinners._self, dinnerQ).toArray(function(err, dinners){
-       if(err) return next(err);
-       res.send(dinners);
-     });
-   });
- };
-
-/*
- * Opens a dinner for the night.
- * @param name      the name of the host serving the food
- * @param location  the location of the host
- * @param desc      the food style DESCription that will be served
- * @return 'DONE' if request input was successful, 'ERR' if not.
- */
-RequestController.openDinner = function(req, res, next){
-  var host     = req.query.name,
-      location = req.query.location,
-      capacity = req.query.capacity,
-      food     = req.query.food;
-
-      var student    = req.query.name,
-          location   = req.query.location,
-          desc       = req.query.desc;
-
-};
-
-/*
  * Looks at nearby requests for food.
  * @param location the location of the server
  * @return SQL rows of all open requests within (5 km?)
  *
  */
 RequestController.seeRequests = function(req, res, next){
+  var location = req.query.location;
+
+  var reqQuer = {
+    query: "SELECT * FROM docs d where d.isOpen = 1",
+  }
+  Models.client.queryDocuments(Models.requests._self, querySpec).toArray(function(err, reqs){
+    if (err) return next(err);
+    for (var index in reqs){
+      var request = reqs[index];
+      //calculate distance to host location
+      request.distTo = RequestController.distCalc(location, req.location);
+
+      //remove if too far away
+      if(request.distTo > request.dist){
+        reqs.splice(index, 1);
+      }
+    }
+
+    //sort by decreasing distance
+    reqs.sort(function(r1, r2){
+      return r1.distTo - r2.distTo;
+    });
+    res.send(reqs);
+  });
+};
+
+RequestController.distCalc = function(point1, point2){
 
 };
 
