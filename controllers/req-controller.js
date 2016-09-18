@@ -1,8 +1,13 @@
 var Connection = require('tedious').Connection;
 
 var config = {
+<<<<<<< HEAD
     userName: '****',
     password: '****',
+=======
+    userName: 'jarvis',
+    password: process.env.hbAzurePW,
+>>>>>>> cc1c591901bc804d1259e343c2d52fd00e8a340f
     server: 'homebites.database.windows.net',
     // If you are on Microsoft Azure, you need this:
     options: {encrypt: true, database: 'homeBites'}
