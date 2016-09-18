@@ -50,7 +50,9 @@ RequestController.requestFood = function(req, res, next){
   Models.client.queryDocuments(Models.users._self, querySpec).toArray(function(err, users){
     if (users.length > 0){
       user = users[0];
-      user.location = location;
+      Models.client.deleteDocument(user._self, function(err){
+        if(err) return next(err);
+      });
     } else{
       var user = {
         "fbID"       : id,
@@ -100,15 +102,42 @@ RequestController.seeRequests = function(req, res, next){
 };
 
 /*
- *
- *
- *
+ * Updates the Location of an ID
+ * @param id        the FbID of the person
+ * @param location  the new location of the person
+ * @returns DONE if success, else nothing.
  */
  RequestController.putLocID = function(req, res, next){
    var location = req.query.location,
        id       = req.query.id;
 
-   
+   var querySpec = {
+       query: 'SELECT * FROM docs d WHERE d.fbID = @id',
+       parameters: [{
+           name: '@id',
+           value: id
+       }]
+   };
+   Models.client.queryDocuments(Models.users._self, querySpec).toArray(function(err, users){
+     if (users.length > 0){
+       user = users[0];
+       Models.client.deleteDocument(user._self, function(err){
+         if(err) return next(err);
+       });
+     } else{
+       var user = {
+         "fbID"       : id,
+         "location"   : location
+       }
+
+       Models.client.createDocument(Models.users._self, user, function(err, doc){
+         if (err) return next(err);
+       });
+     }
+
+   });
+
+   res.send("DONE");
  }
 
 /*

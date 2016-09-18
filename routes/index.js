@@ -6,6 +6,7 @@ var reqController = require('../controllers/req-controller')
 
 router.get('/req/', reqController.requestFood);
 router.get('/see/', reqController.seeRequests);
-router.get('/loc', reqController.locByID)
+router.get('/loc', reqController.locByID);
+router.get('/putLoc', reqController.putLocID);
 
 module.exports = router;
